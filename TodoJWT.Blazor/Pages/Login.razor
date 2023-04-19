@@ -1,0 +1,113 @@
+﻿@page "/login"
+@inject ApiHandler ApiHandler
+@inject NavigationManager Navigation
+
+<div class="content">
+    <h1>Login</h1>
+
+    <div>
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" @oninput="ValidateUsername"/>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input id="password" type="password" @oninput="ValidatePassword"/>
+        </div>
+
+        <button class="form-submit-button" type="submit" @onclick="OnSubmit">Login</button>
+    </div>
+
+    <div class="form-errors">
+        <p>@ApiCallError</p>
+        <p>@UsernameError</p>
+        <p>@PasswordError</p>
+    </div>
+</div>
+
+@code {
+    public LoginRegisterDto LoginModel { get; set; } = new LoginRegisterDto();
+
+    public string ApiCallError { get; set; } = string.Empty;
+    public string UsernameError { get; set; } = string.Empty;
+    public string PasswordError { get; set; } = string.Empty;
+
+    private const string _toShort = "{0} is to short. Must be at least 5 characters long.";
+    private const string _toLong = "{0} is to long. {0} cannot be longer then 20 characters.";
+
+    public void ValidateUsername(ChangeEventArgs e)
+    {
+        if (e.Value == null)
+        {
+            return;
+        }
+
+        LoginModel.Username = (string)e.Value;
+    }
+
+    public void ValidatePassword(ChangeEventArgs e)
+    {
+        if (e.Value == null)
+        {
+            return;
+        }
+
+        LoginModel.Password = (string)e.Value;
+    }
+
+    // TODO: Validation flow is stupid
+    public async void OnSubmit()
+    {
+        ApiCallError = string.Empty;
+        bool isFormValid = true;
+
+        if (!_isLengthValid(LoginModel.Username))
+        {
+            UsernameError = LoginModel.Username.Length < 5
+                ? string.Format(_toShort, "Username")
+                : (LoginModel.Username.Length > 20 ? string.Format(_toLong, "Username") : string.Empty);
+
+            isFormValid = false;
+        }
+        else
+        {
+            UsernameError = string.Empty;
+        }
+
+        if (!_isLengthValid(LoginModel.Password))
+        {
+            PasswordError = LoginModel.Password.Length < 5
+                ? string.Format(_toShort, "Password")
+                : (LoginModel.Password.Length > 20 ? string.Format(_toLong, "Password") : string.Empty);
+
+            isFormValid = false;
+        }
+        else
+        {
+            PasswordError = string.Empty;
+        }
+
+        if (isFormValid)
+        {
+            ApiHandlerResponse response = await ApiHandler.LoginUser(LoginModel);    
+
+            if (response.Success)
+            {
+                Navigation.NavigateTo("/");
+            }
+            else
+            {
+                ApiCallError = response.Message;
+            }
+        }
+
+        StateHasChanged();
+    }
+
+    private bool _isLengthValid(string input)
+    {
+        int length = input.Length;
+        return !(length < 5 || length > 20);
+    }
+}

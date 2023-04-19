@@ -1,0 +1,73 @@
+﻿@inject ApiHandler ApiHandler
+
+<div class="add-new-task-container">
+    <h2>Add new Task</h2>
+
+    <div class="form-container">
+        <div class="input-container">
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" @bind="Name"/>
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <input type="text" @bind="Description"/>
+            </div>
+        </div>
+
+        <button @onclick=CreateTask>Add</button>
+    </div>
+</div>
+
+<div class="form-errors">
+    <p>@ApiError</p>
+    <p>@NameError</p>
+    <p>@DescriptionError</p>
+</div>
+
+
+@code {
+    [Parameter]
+    public Action UpdateTaskList { get; set; }
+
+    public string Name { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+
+    public string NameError = string.Empty;
+    public string DescriptionError = string.Empty;
+    public string ApiError = string.Empty;
+
+    public async void CreateTask()
+    {
+        ApiError = string.Empty;
+
+        bool isNameValid = InputValidation.IsInputValid(Name, "Name", out NameError);
+        bool isDescriptionValid = !InputValidation.IsInputToShort(Description, "Description", out DescriptionError);
+
+        if (!isNameValid || !isDescriptionValid)
+        {
+            return;
+        }
+
+        TodoTaskDto task = new TodoTaskDto()
+        {
+            Name = Name,
+            Description = Description,
+            IsCompleated = false
+        };
+
+        ApiHandlerResponse response = await ApiHandler.CreateUserTask(task);
+
+        if (response.Success)
+        {
+            Name = string.Empty;
+            Description = string.Empty;
+            UpdateTaskList?.Invoke();
+        }
+        else
+        {
+            ApiError = response.Message;
+            StateHasChanged();
+        }
+    }
+}

@@ -1,0 +1,18 @@
+﻿@page "/"
+@inject ApiHandler ApiHandler
+
+
+<div class="content">
+    <AuthorizeView>
+        <Authorized>
+            <IndexTaskList/>
+        </Authorized>
+        <NotAuthorized>
+            Please login
+        </NotAuthorized>
+    </AuthorizeView>
+</div>
+
+@code {
+
+}

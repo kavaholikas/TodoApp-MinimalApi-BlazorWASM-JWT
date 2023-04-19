@@ -1,0 +1,21 @@
+﻿.task .buttons {
+    display: flex;
+    flex-direction: row;
+
+    justify-content: space-between;
+}
+
+.task .buttons button {
+    width: 128px;
+    background-color: white;
+}
+
+.task .buttons button:hover {
+    background-color: lightgray;
+}
+
+.task .buttons button.completed {
+    color: green;
+    border-color: green;
+    background-color: lightgreen;
+}

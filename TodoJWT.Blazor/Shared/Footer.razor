@@ -1,0 +1,13 @@
+﻿<div class="footer">
+    <AuthorizeView>
+        <a href="/change-password" class="footer-link">Change Password</a>
+    </AuthorizeView>
+    <AuthorizeView Roles="admin">
+        <AdminBar />
+    </AuthorizeView>
+    <small>© @DateTime.Now.Year, Kavaholikas</small>
+</div>
+
+@code {
+
+}

@@ -1,0 +1,40 @@
+﻿@page "/manage-users"
+@attribute [Authorize(Roles = "admin")]
+@inject ApiHandler ApiHandler
+
+<div class="content">
+    @if (Users != null)
+    {
+        @foreach (UserDto user in Users)
+        {
+            <UserComponent User="user" UpdateUserList="GetUsers"/>
+        }
+    }
+    else
+    {
+        <h2>No users Found</h2>
+    }
+
+
+</div>
+
+@code {
+    public List<UserDto>? Users { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        GetUsers();
+    }
+
+    public async void GetUsers()
+    {
+        ApiHandlerResponse response = await ApiHandler.GetUsers();
+
+        if (response.Success)
+        {
+            Users = response.Users;
+            StateHasChanged();
+        } 
+    }
+
+}

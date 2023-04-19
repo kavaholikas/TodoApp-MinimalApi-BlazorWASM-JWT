@@ -1,0 +1,133 @@
+﻿@page "/register"
+@inject ApiHandler ApiHandler
+@inject NavigationManager Navigation
+
+<div class="content">
+    <h1>Register</h1>
+
+    <div>
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" @oninput="ValidateUsername"/>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input id="password" type="password" @oninput="ValidatePassword"/>
+        </div>
+
+        <div class="form-group">
+            <label for="repeatPassword">Repeat Password</label>
+            <input id="repeatPassword" type="password" @oninput="ValidateRepeatPassword"/>
+        </div>
+
+        <button class="form-submit-button" disabled=@ButtonDisabled type="submit" @onclick="OnSubmit">Register</button>
+    </div>
+
+    <div class="form-errors">
+        <p>@ApiCallError</p>
+        <p>@UsernameError</p>
+        <p>@PasswordError</p>
+        <p>@PassworddsDontMatchError</p>
+    </div>
+</div>
+
+@code {
+    public LoginRegisterDto RegisterModel { get; set; } = new LoginRegisterDto();
+
+    public string UsernameError { get; set; } = string.Empty;
+    public string PasswordError { get; set; } = string.Empty;
+    public string PassworddsDontMatchError { get; set; } = string.Empty;
+    public string ApiCallError { get; set; } = string.Empty;
+
+    public bool ButtonDisabled => !_isFormValid();
+
+    private const string _toShort = "{0} is to short. Must be at least 5 characters long.";
+    private const string _toLong = "{0} is to long. {0} cannot be longer then 20 characters.";
+
+    public void ValidateUsername(ChangeEventArgs e)
+    {
+        if (e.Value == null)
+        {
+            return;
+        }
+
+        RegisterModel.Username = (string)e.Value;
+
+        UsernameError = RegisterModel.Username.Length < 5
+            ? string.Format(_toShort, "Username")
+            : (RegisterModel.Username.Length > 20 ? string.Format(_toLong, "Username") : string.Empty);
+    }
+
+    public void ValidatePassword(ChangeEventArgs e)
+    {
+        if (e.Value == null)
+        {
+            return;
+        }
+
+        RegisterModel.Password = (string)e.Value;
+
+        PasswordError = RegisterModel.Password.Length < 5
+            ? string.Format(_toShort, "Password")
+            : (RegisterModel.Password.Length > 20 ? string.Format(_toLong, "Password") : string.Empty);
+
+    }
+
+    public void ValidateRepeatPassword(ChangeEventArgs e)
+    {
+        if (e.Value == null)
+        {
+            return;
+        }
+
+        RegisterModel.RepeatPassword = (string)e.Value;
+
+        PassworddsDontMatchError = RegisterModel.Password != RegisterModel.RepeatPassword ? "Passwords dont match." : string.Empty;
+    }
+
+    public async void OnSubmit()
+    {
+        if (_isFormValid())
+        {
+            ApiHandlerResponse response = await ApiHandler.RegisterUser(RegisterModel);
+            if (response.Success)
+            {
+                Navigation.NavigateTo("/");
+            }
+            else
+            {
+                ApiCallError = response.Message;
+            }
+        }
+        else
+        {
+            ApiCallError = "Please Correct Form";
+        }
+
+        StateHasChanged();
+    }
+
+    private bool _isFormValid()
+    {
+        if (!_isLengthValid(RegisterModel.Username))
+            return false;
+
+        if (!_isLengthValid(RegisterModel.Password))
+            return false;
+
+        if (!_isLengthValid(RegisterModel.RepeatPassword))
+            return false;
+
+        if (RegisterModel.Password != RegisterModel.RepeatPassword)
+            return false;
+
+        return true;
+    }
+
+    private bool _isLengthValid(string input)
+    {
+        int length = input.Length;
+        return !(length < 5 || length > 20);
+    }
+}

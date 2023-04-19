@@ -1,0 +1,39 @@
+﻿@inject ApiHandler ApiHandler
+@inject NavigationManager Navigation
+
+<div class="nav">
+    <div class="header">
+        <h1>Todo App</h1>
+    </div>
+
+    <AuthorizeView>
+        <Authorized>
+            <div class="links logout">
+                <p>
+                    @context.User.Identity.Name
+                </p>
+
+                <NavLink href="/" class="long">Current Tasks</NavLink>
+                <NavLink href="/archived-tasks" class="long">Archived Tasks</NavLink>
+
+                <button @onclick=@Logout>Logout</button>
+            </div>
+        </Authorized>
+        <NotAuthorized>
+            <div class="links login">
+                <NavLink href="/login">Login</NavLink>
+                <NavLink href="/Register">Register</NavLink>
+                <NavLink href="/">Home</NavLink>
+            </div>
+        </NotAuthorized>
+    </AuthorizeView>
+</div>
+
+@code {
+
+    public void Logout()
+    {
+        ApiHandler.LogoutUser();
+        Navigation.NavigateTo("/");
+    }
+}

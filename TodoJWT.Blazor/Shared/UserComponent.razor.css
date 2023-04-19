@@ -1,0 +1,13 @@
+﻿.user .admin {
+    color: lightgreen;
+}
+
+.user .controls button {
+    margin: 0 1em;
+    width: 128px;
+    background-color: white;
+}
+
+.user .controls button:hover {
+    background-color: lightgray;
+}

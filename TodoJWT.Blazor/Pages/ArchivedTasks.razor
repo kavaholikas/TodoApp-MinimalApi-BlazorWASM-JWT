@@ -1,0 +1,45 @@
+﻿@page "/archived-tasks"
+@inject ApiHandler ApiHandler
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize]
+
+<div class="content">
+    <h1>Archived Tasks</h1>
+
+    @if (Tasks == null)
+    {
+        <div>
+            Loading Tasks...
+        </div>
+    }
+    else if (Tasks.Count > 0)
+    {
+        @foreach (TodoTaskDto task in Tasks)
+        {
+            <ArchivedTaskComponent Task="task"/>
+        }
+    }
+    else
+    {
+       <div>
+           No Tasks Found
+       </div>
+    }
+</div>
+
+@code {
+    public List<TodoTaskDto> Tasks { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        ApiHandlerResponse response = await ApiHandler.GetUserArchivedTasks();
+
+        if (response.Success)
+        {
+            Tasks = response.Tasks ?? new List<TodoTaskDto>();
+        }
+
+        StateHasChanged();
+
+    }
+}

@@ -1,0 +1,47 @@
+﻿@inject ApiHandler ApiHandler
+
+<h1>Task List</h1>
+
+@if (Tasks == null)
+{
+    <div>
+        Loading Tasks...
+    </div>
+}
+else if (Tasks.Count > 0)
+{
+    @foreach (TodoTaskDto task in Tasks)
+    {
+        <TaskComponent Task="task" UpdateTaskList="GetTasksFromApi"/>
+    }
+}
+else
+{
+    <div>
+        No Tasks Found
+    </div>
+}
+
+<AddNewTask UpdateTaskList="GetTasksFromApi" />
+
+@code {
+    public List<TodoTaskDto> Tasks { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        GetTasksFromApi();
+    }
+
+    public async void GetTasksFromApi()
+    {
+        ApiHandlerResponse response =  await ApiHandler.GetUserTasks();
+
+        if (response.Success)
+        {
+            Tasks = response.Tasks ?? new List<TodoTaskDto>();
+        }
+
+        StateHasChanged();
+    }
+
+}

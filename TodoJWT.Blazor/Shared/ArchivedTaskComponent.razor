@@ -1,0 +1,11 @@
+﻿<div class="task">
+    <h2>@Task.Name <span style="color: lightgreen">[Completed]</span></h2>
+    <hr/>
+    <p>@Task.Description</p>
+</div>
+
+@code {
+    [Parameter]
+    public TodoTaskDto Task { get; set; }
+
+}

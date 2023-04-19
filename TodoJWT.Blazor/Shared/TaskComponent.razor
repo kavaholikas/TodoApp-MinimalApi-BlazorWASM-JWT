@@ -1,0 +1,62 @@
+﻿@inject ApiHandler ApiHandler
+
+<div class="task">
+    <h2>@Task.Name</h2>
+    <hr/>
+    <p>@Task.Description</p>
+    <hr/>
+
+    <div class="buttons">
+        <button disabled=@IsCompleteButtonDisabled class="@CompleteButtonClass" @onclick="CompleteTask">@CompleteText</button>
+        <button @onclick="RemoveArchiveTask">@RemoveText</button>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public TodoTaskDto Task { get; set; }
+    [Parameter]
+    public Action UpdateTaskList { get; set; }
+
+    public string CompleteText => Task.IsCompleated ? "Completed" : "Complete";
+    public string RemoveText => Task.IsCompleated ? "Archive" : "Remove";
+
+    public bool IsCompleteButtonDisabled => Task.IsCompleated;
+    public string CompleteButtonClass => Task.IsCompleated ? "completed" : "";
+
+    public async void CompleteTask()
+    {
+        if (Task.IsCompleated)
+        {
+            return;
+        }
+
+        ApiHandlerResponse response = await ApiHandler.CompleteUserTask(Task.TodoTaskID);
+
+        if (response.Success)
+        {
+            Task.IsCompleated = true;
+            StateHasChanged();
+        }
+
+    }
+
+    public async void RemoveArchiveTask()
+    {
+        ApiHandlerResponse response;
+
+        if (Task.IsCompleated)
+        {
+            response = await ApiHandler.ArchiveUserTask(Task.TodoTaskID); 
+        }
+        else
+        {
+            response = await ApiHandler.RemoveUserTask(Task.TodoTaskID);
+        }
+
+        if (response.Success)
+        {
+            UpdateTaskList?.Invoke();
+        }
+    }
+}

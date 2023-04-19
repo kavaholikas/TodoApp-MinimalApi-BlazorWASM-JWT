@@ -1,0 +1,40 @@
+﻿@inject ApiHandler ApiHandler
+
+<div class="user">
+   <h2>
+       @User.Username
+
+       @if (User.IsAdmin)
+        {
+            <span class="admin"> [Admin]</span>
+        }
+    </h2>
+   <hr/>
+
+   <div class="controls">
+       <span>User ID: @User.UserID</span>
+       
+       @if (!User.IsAdmin)
+        {
+            <button @onclick="DeleteUser">Delete</button>
+        }
+   </div>
+</div>
+
+@code {
+    [Parameter]
+    public UserDto User { get; set; }
+    [Parameter]
+    public Action UpdateUserList { get; set; }
+
+    public async void DeleteUser()
+    {
+        ApiHandlerResponse response = await ApiHandler.DeleteUser(User.UserID);
+
+        if(response.Success)
+        {
+            UpdateUserList?.Invoke(); 
+        }
+    }
+
+}

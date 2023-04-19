@@ -1,0 +1,29 @@
+﻿.add-new-task-container {
+    border:  1px solid black;
+    margin: 1em;
+}
+
+.add-new-task-container h2 {
+    text-align: center;
+    margin: 0.5em 0;
+}
+
+.add-new-task-container .form-container {
+    display: flex;
+    flex-direction: row;
+
+    padding: 1em;
+}
+
+.form-container button {
+    font-size: 1.25rem;
+    width: 96px;
+
+    margin: 0.5em;
+
+    background-color: white;
+}
+
+.form-container button:hover {
+    background-color: lightgray;
+}
